@@ -27,7 +27,7 @@ def load_data():
 df = load_data()
 
 # --- Filters ---
-st.title("📦 PO Payment Dashboard")
+st.title("PO Payment Dashboard")
 
 cols = st.columns(5)
 with cols[0]: mr_filter = st.text_input("MR")

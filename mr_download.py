@@ -46,23 +46,14 @@ insert_pos = cols.index("Purchasing Document") + 1
 cols.insert(insert_pos, "Payment Status")
 filtered_df = filtered_df[cols]
 
+filtered_df["Net Price"] = pd.to_numeric(filtered_df["Net Price"], errors="coerce").round(2)
+filtered_df["Total Line Item Price"] = pd.to_numeric(filtered_df["Total Line Item Price"], errors="coerce").round(2)
+
 # Build interactive grid options
 gb = GridOptionsBuilder.from_dataframe(filtered_df)
 gb.configure_pagination()
 gb.configure_side_bar()
 gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc="sum", editable=False)
-
-gb.configure_column(
-    "Net Price",
-    type=["numericColumn"],
-    valueFormatter="Number(parseFloat(params.value).toFixed(2))"
-)
-
-gb.configure_column(
-    "Total Line Item Price",
-    type=["numericColumn"],
-    valueFormatter="Number(parseFloat(params.value).toFixed(2))"
-)
 
 gb.configure_column("Shopping Cart", hide=True)
 gb.configure_column("REMOTE/INDOOR", hide=True)

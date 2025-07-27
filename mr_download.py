@@ -27,6 +27,13 @@ with cols[2]: net_name_filter = st.text_input("Network Name")
 with cols[3]: po_doc_filter = st.text_input("PO Number")
 with cols[4]: hwm_filter = st.text_input("HWMDS")
 
+cols = list(filtered_df.columns)
+cols.remove("Payment Status")  # Remove it from its current position
+
+# Insert it right after "Purchasing Document"
+insert_pos = cols.index("Purchasing Document") + 1
+cols.insert(insert_pos, "Payment Status")
+
 # --- Apply Filters ---
 filtered_df = df.copy()
 if mr_filter: filtered_df = filtered_df[filtered_df["MR"].str.contains(mr_filter, case=False, na=False)]

@@ -1,16 +1,33 @@
 import streamlit as st
 import pandas as pd
+import requests
+from io import BytesIO
 
-# --- Load Data ---
-@st.cache_data
+# === CONFIG ===
+SHAREPOINT_URL = "https://ericssonnam.sharepoint.com/:x:/r/sites/RPCAProjectOffice/Shared%20Documents/Operations%20%26%20Order%20Desk%20Workspace/Order%20Desk%20DIRECTMAT%20Purchases/DirectMat_HWPOs_Metric_FY2025/HW%20MATERIAL%20TRACKER%202025.xlsx?d=w521f89b3c7624808a3a06f0b7a8a8c76&csf=1&web=1&e=y9uG8l"
+
+# --- Load Data from SharePoint ---
+@st.cache_data(ttl=300)
 def load_data():
-    df = pd.read_excel("Formatted_PO_Data OG.xlsx", sheet_name="MasterData", dtype=str)
+    response = requests.get(SHAREPOINT_URL)
+    if response.status_code != 200:
+        st.error("❌ Failed to fetch Excel file from SharePoint.")
+        st.stop()
+    
+    file = BytesIO(response.content)
+    df = pd.read_excel(file, sheet_name="MasterData", engine="openpyxl", dtype=str)
+
+    # Ensure numeric fields are float
     df["GR Qty"] = df["GR Qty"].astype(float)
     df["IR Qty"] = df["IR Qty"].astype(float)
+
+    # Add Payment Status
     df["Payment Status"] = df.apply(
         lambda row: "✅ Paid" if row["GR Qty"] == row["IR Qty"] and row["GR Qty"] > 0
         else ("❌ Not Started" if row["GR Qty"] == 0 and row["IR Qty"] == 0
-        else "⏳ Pending"), axis=1)
+        else "⏳ Pending"), axis=1
+    )
+
     return df
 
 df = load_data()
@@ -38,3 +55,4 @@ st.dataframe(filtered_df)
 
 # --- Download Button ---
 st.download_button("📥 Download Report", filtered_df.to_csv(index=False), file_name="PO_Report.csv")
+

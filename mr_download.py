@@ -102,3 +102,27 @@ AgGrid(
     fit_columns_on_grid_load=False,
     autoSizeAllColumns=True
 )
+
+filtered_df["Total Line Item Price"] = pd.to_numeric(filtered_df["Total Line Item Price"], errors="coerce")
+filtered_df["Exchange Rate"] = pd.to_numeric(filtered_df["Exchange Rate"], errors="coerce")
+
+# --- Drop rows with missing required values ---
+summary_df = filtered_df.dropna(subset=["Total Line Item Price", "Exchange Rate", "Payment Status"])
+
+# --- Calculate Actual and Pending Payments in CAD ---
+actual_payment = (
+    summary_df[summary_df["Payment Status"] == "✅ Paid"]
+    .apply(lambda row: row["Total Line Item Price"] * row["Exchange Rate"], axis=1)
+    .sum()
+)
+
+pending_payment = (
+    summary_df[summary_df["Payment Status"] != "✅ Paid"]
+    .apply(lambda row: row["Total Line Item Price"] * row["Exchange Rate"], axis=1)
+    .sum()
+)
+
+# --- Display Summary ---
+st.markdown("### 💰 Summary Report (CAD)")
+st.metric("✅ Actual Payment (Paid)", f"${actual_payment:,.2f} CAD")
+st.metric("⏳ Pending Payment (Unpaid)", f"${pending_payment:,.2f} CAD")

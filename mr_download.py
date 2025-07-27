@@ -33,6 +33,18 @@ if net_name_filter: filtered_df = filtered_df[filtered_df["Network Name"].str.co
 if po_doc_filter: filtered_df = filtered_df[filtered_df["Purchasing Document"].str.contains(po_doc_filter, case=False, na=False)]
 if hwm_filter: filtered_df = filtered_df[filtered_df["HWMDS"].str.contains(hwm_filter, case=False, na=False)]
 
+# CSS tweak
+st.markdown("""
+    <style>
+        .element-container:has(.stDataFrame) {
+            width: 100% !important;
+        }
+        .stDataFrame > div {
+            width: 100% !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 # --- Show Data ---
 st.dataframe(filtered_df, use_container_width=True)
 

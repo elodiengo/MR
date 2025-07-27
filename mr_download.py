@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
+from st_aggrid import AgGrid, GridOptionsBuilder
 
+st.set_page_config(layout="wide")
 # --- Load Data ---
 @st.cache_data
 def load_data():
@@ -32,8 +34,6 @@ if net_num_filter: filtered_df = filtered_df[filtered_df["Network Number"].str.c
 if net_name_filter: filtered_df = filtered_df[filtered_df["Network Name"].str.contains(net_name_filter, case=False, na=False)]
 if po_doc_filter: filtered_df = filtered_df[filtered_df["Purchasing Document"].str.contains(po_doc_filter, case=False, na=False)]
 if hwm_filter: filtered_df = filtered_df[filtered_df["HWMDS"].str.contains(hwm_filter, case=False, na=False)]
-
-from st_aggrid import AgGrid, GridOptionsBuilder
 
 # Build interactive grid options
 gb = GridOptionsBuilder.from_dataframe(filtered_df)

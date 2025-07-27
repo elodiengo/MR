@@ -34,7 +34,7 @@ if po_doc_filter: filtered_df = filtered_df[filtered_df["Purchasing Document"].s
 if hwm_filter: filtered_df = filtered_df[filtered_df["HWMDS"].str.contains(hwm_filter, case=False, na=False)]
 
 # --- Show Data ---
-st.dataframe(filtered_df)
+st.dataframe(filtered_df, use_container_width=True)
 
 # --- Download Button ---
 st.download_button("📥 Download Report", filtered_df.to_csv(index=False), file_name="PO_Report.csv")

@@ -46,8 +46,8 @@ insert_pos = cols.index("Purchasing Document") + 1
 cols.insert(insert_pos, "Payment Status")
 filtered_df = filtered_df[cols]
 
-filtered_df["Net Price"] = pd.to_numeric(filtered_df["Net Price"], errors="coerce").round(2)
-filtered_df["Total Line Item Price"] = pd.to_numeric(filtered_df["Total Line Item Price"], errors="coerce").round(2)
+filtered_df["Net Price"] = filtered_df["Net Price"].map(lambda x: f"{x:.2f}" if pd.notnull(x) else "")
+filtered_df["Total Line Item Price"] = filtered_df["Total Line Item Price"].map(lambda x: f"{x:.2f}" if pd.notnull(x) else "")
 
 # Build interactive grid options
 gb = GridOptionsBuilder.from_dataframe(filtered_df)

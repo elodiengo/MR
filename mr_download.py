@@ -10,9 +10,14 @@ def load_data():
     df["GR Qty"] = df["GR Qty"].astype(float)
     df["IR Qty"] = df["IR Qty"].astype(float)
     df["Payment Status"] = df.apply(
-        lambda row: "✅ Paid" if row["GR Qty"] == row["IR Qty"] and row["GR Qty"] > 0
-        else ("❌ Not Started" if row["GR Qty"] == 0 and row["IR Qty"] == 0
-        else "⏳ Pending"), axis=1)
+    lambda row: (
+        "✅ Paid" if row["GR Qty"] == row["IR Qty"] and row["GR Qty"] > 0 else
+        "❌ Not Started" if row["GR Qty"] == 0 and row["IR Qty"] == 0 else
+        "⏳ Payment Pending - Good Receipts" if row["GR Qty"] < row["IR Qty"] else
+        "⏳ Payment Pending - Missing Supplier Invoice"
+    ),
+    axis=1
+)
     return df
 
 df = load_data()

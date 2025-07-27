@@ -33,20 +33,21 @@ if net_name_filter: filtered_df = filtered_df[filtered_df["Network Name"].str.co
 if po_doc_filter: filtered_df = filtered_df[filtered_df["Purchasing Document"].str.contains(po_doc_filter, case=False, na=False)]
 if hwm_filter: filtered_df = filtered_df[filtered_df["HWMDS"].str.contains(hwm_filter, case=False, na=False)]
 
-# CSS tweak
-st.markdown("""
-    <style>
-        .element-container:has(.stDataFrame) {
-            width: 100% !important;
-        }
-        .stDataFrame > div {
-            width: 100% !important;
-        }
-    </style>
-""", unsafe_allow_html=True)
+from st_aggrid import AgGrid, GridOptionsBuilder
 
-# --- Show Data ---
-st.dataframe(filtered_df, use_container_width=True)
+# Build interactive grid options
+gb = GridOptionsBuilder.from_dataframe(filtered_df)
+gb.configure_pagination()
+gb.configure_side_bar()
+gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc="sum", editable=False)
+grid_options = gb.build()
 
-# --- Download Button ---
-st.download_button("📥 Download Report", filtered_df.to_csv(index=False), file_name="PO_Report.csv")
+# Render the AgGrid table
+AgGrid(
+    filtered_df,
+    gridOptions=grid_options,
+    enable_enterprise_modules=False,
+    allow_unsafe_jscode=True,
+    height=500,
+    fit_columns_on_grid_load=True
+)

@@ -19,11 +19,11 @@ df = load_data()
 st.title("📦 PO Payment Dashboard")
 
 cols = st.columns(5)
-with cols[0]: mr_filter = st.text_input("🔍 MR")
-with cols[1]: net_num_filter = st.text_input("📡 Network Number")
-with cols[2]: net_name_filter = st.text_input("🏷️ Network Name")
-with cols[3]: po_doc_filter = st.text_input("📑 Purchasing Document")
-with cols[4]: hwm_filter = st.text_input("👤 HWMDS")
+with cols[0]: mr_filter = st.text_input("MR")
+with cols[1]: net_num_filter = st.text_input("Network Number")
+with cols[2]: net_name_filter = st.text_input("Network Name")
+with cols[3]: po_doc_filter = st.text_input("PO Number")
+with cols[4]: hwm_filter = st.text_input("HWMDS")
 
 # --- Apply Filters ---
 filtered_df = df.copy()

@@ -40,6 +40,14 @@ gb = GridOptionsBuilder.from_dataframe(filtered_df)
 gb.configure_pagination()
 gb.configure_side_bar()
 gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc="sum", editable=False)
+
+gb.configure_column("Shopping Cart", hide=True)
+gb.configure_column("REMOTE/INDOOR", hide=True)
+gb.configure_column("Vendor No", hide=True)
+gb.configure_column("GR/IR Mismatch", hide=True)
+gb.configure_column("IR Document No.", hide=True)
+gb.configure_column("Invoice Date.", hide=True)
+gb.configure_column("Invoice Due Date.", hide=True)
 grid_options = gb.build()
 
 # Render the AgGrid table

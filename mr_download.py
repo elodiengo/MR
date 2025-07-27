@@ -49,5 +49,6 @@ AgGrid(
     enable_enterprise_modules=False,
     allow_unsafe_jscode=True,
     height=800,
-    fit_columns_on_grid_load=True
+    fit_columns_on_grid_load=False,  # Disable this so autoSize works better
+    autoSizeAllColumns=True
 )

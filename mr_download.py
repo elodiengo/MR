@@ -11,7 +11,6 @@ def load_data():
     df = pd.read_excel("Formatted_PO_Data OG.xlsx", sheet_name="MasterData", dtype=str)
     df["GR Qty"] = df["GR Qty"].astype(float)
     df["IR Qty"] = df["IR Qty"].astype(float)
-
     df["PO Released Date"] = pd.to_datetime(df["PO Released Date"], errors="coerce")
 
     df["Payment Status"] = df.apply(
@@ -38,7 +37,7 @@ with cols[3]: po_doc_filter = st.text_input("PO Number")
 with cols[4]: hwm_filter = st.text_input("HWMDS")
 
 cols2 = st.columns(1)
-with cols2[0]: short_text_filter = st.text_input("Short Text (contains)")
+with cols2[0]: short_text_filter = st.text_input("Short Text (contains, multiple allowed)")
 
 # --- PO Released Date Filter ---
 st.markdown("### 📅 Filter by PO Released Date")
@@ -79,34 +78,10 @@ if "Payment Status" in cols and "Purchasing Document" in cols:
 filtered_df["Net Price"] = pd.to_numeric(filtered_df["Net Price"], errors="coerce").round(2)
 filtered_df["Total Line Item Price"] = pd.to_numeric(filtered_df["Total Line Item Price"], errors="coerce").round(2)
 
-# Optional formatting as strings with 2 decimals (for display only)
+# Optional: format display as strings with 2 decimals
 filtered_df["Net Price"] = filtered_df["Net Price"].map(lambda x: f"{x:.2f}" if pd.notnull(x) else "")
 filtered_df["Total Line Item Price"] = filtered_df["Total Line Item Price"].map(lambda x: f"{x:.2f}" if pd.notnull(x) else "")
 
-if short_text_filter:
-    search_terms = short_text_filter.lower().split()
-
-    js_highlight = """
-    function(params) {
-        if (!params.value) return '';
-        let value = params.value;
-        const keywords = [%s];
-        keywords.forEach(function(word) {
-            const re = new RegExp(word, 'gi');
-            value = value.replace(re, function(match) {
-                return '<span style="background-color: yellow; font-weight: bold;">' + match + '</span>';
-            });
-        });
-        return value;
-    }
-    """ % ",".join([f"'{k}'" for k in search_terms])
-
-    gb.configure_column(
-        "Short Text",
-        cellRenderer=js_highlight,
-        wrapText=True,
-        autoHeight=True
-    )
 # --- Build AgGrid table
 gb = GridOptionsBuilder.from_dataframe(filtered_df)
 gb.configure_pagination()
@@ -122,9 +97,29 @@ gb.configure_column("IR Document No.", hide=True)
 gb.configure_column("Invoice Date.", hide=True)
 gb.configure_column("Invoice Due Date.", hide=True)
 
+# ✅ Highlight Short Text matches
+if short_text_filter:
+    search_terms = short_text_filter.lower().split()
+    js_highlight = """
+    function(params) {
+        if (!params.value) return '';
+        let value = params.value;
+        const keywords = [%s];
+        keywords.forEach(function(word) {
+            const re = new RegExp(word, 'gi');
+            value = value.replace(re, function(match) {
+                return '<span style="background-color: yellow; font-weight: bold;">' + match + '</span>';
+            });
+        });
+        return value;
+    }
+    """ % ",".join([f"'{k}'" for k in search_terms])
+    
+    gb.configure_column("Short Text", cellRenderer=js_highlight, wrapText=True, autoHeight=True)
+
 grid_options = gb.build()
 
-# --- Show table
+# --- Show AgGrid Table
 AgGrid(
     filtered_df,
     gridOptions=grid_options,
@@ -135,13 +130,12 @@ AgGrid(
     autoSizeAllColumns=True
 )
 
+# --- Summary Report
 filtered_df["Total Line Item Price"] = pd.to_numeric(filtered_df["Total Line Item Price"], errors="coerce")
 filtered_df["Exchange Rate"] = pd.to_numeric(filtered_df["Exchange Rate"], errors="coerce")
 
-# --- Drop rows with missing required values ---
 summary_df = filtered_df.dropna(subset=["Total Line Item Price", "Exchange Rate", "Payment Status"])
 
-# --- Calculate Actual and Pending Payments in CAD ---
 actual_payment = (
     summary_df[summary_df["Payment Status"] == "✅ Paid"]
     .apply(lambda row: row["Total Line Item Price"] * row["Exchange Rate"], axis=1)
@@ -154,7 +148,7 @@ pending_payment = (
     .sum()
 )
 
-# --- Display Summary ---
 st.markdown("### 💰 Summary Report (CAD)")
 st.metric("✅ Actual Payment (Paid)", f"${actual_payment:,.2f} CAD")
 st.metric("⏳ Pending Payment (Unpaid)", f"${pending_payment:,.2f} CAD")
+

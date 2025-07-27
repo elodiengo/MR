@@ -52,6 +52,18 @@ gb.configure_pagination()
 gb.configure_side_bar()
 gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc="sum", editable=False)
 
+gb.configure_column(
+    "Net Price",
+    type=["numericColumn"],
+    valueFormatter="Number(parseFloat(params.value).toFixed(2))"
+)
+
+gb.configure_column(
+    "Total Line Item Price",
+    type=["numericColumn"],
+    valueFormatter="Number(parseFloat(params.value).toFixed(2))"
+)
+
 gb.configure_column("Shopping Cart", hide=True)
 gb.configure_column("REMOTE/INDOOR", hide=True)
 gb.configure_column("Vendor No", hide=True)

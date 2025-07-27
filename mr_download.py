@@ -48,6 +48,6 @@ AgGrid(
     gridOptions=grid_options,
     enable_enterprise_modules=False,
     allow_unsafe_jscode=True,
-    height=500,
+    height=800,
     fit_columns_on_grid_load=True
 )

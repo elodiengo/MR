@@ -37,6 +37,9 @@ with cols[2]: net_name_filter = st.text_input("Network Name")
 with cols[3]: po_doc_filter = st.text_input("PO Number")
 with cols[4]: hwm_filter = st.text_input("HWMDS")
 
+cols2 = st.columns(1)
+with cols2[0]: short_text_filter = st.text_input("Short Text (contains)")
+
 # --- PO Released Date Filter ---
 st.markdown("### 📅 Filter by PO Released Date")
 min_date = df["PO Released Date"].min().date() if df["PO Released Date"].notnull().any() else date(2000, 1, 1)
@@ -48,6 +51,11 @@ to_date = st.date_input("To Date", value=max_date, min_value=min_date, max_value
 # --- Apply Filters ---
 filtered_df = df.copy()
 if mr_filter: filtered_df = filtered_df[filtered_df["MR"].str.contains(mr_filter, case=False, na=False)]
+if short_text_filter:
+    keywords = short_text_filter.lower().split()
+    filtered_df = filtered_df[
+        filtered_df["Short Text"].str.lower().apply(lambda text: any(k in text for k in keywords) if pd.notnull(text) else False)
+    ]
 if net_num_filter: filtered_df = filtered_df[filtered_df["Network Number"].str.contains(net_num_filter, case=False, na=False)]
 if net_name_filter: filtered_df = filtered_df[filtered_df["Network Name"].str.contains(net_name_filter, case=False, na=False)]
 if po_doc_filter: filtered_df = filtered_df[filtered_df["Purchasing Document"].str.contains(po_doc_filter, case=False, na=False)]
@@ -74,6 +82,31 @@ filtered_df["Total Line Item Price"] = pd.to_numeric(filtered_df["Total Line Ite
 # Optional formatting as strings with 2 decimals (for display only)
 filtered_df["Net Price"] = filtered_df["Net Price"].map(lambda x: f"{x:.2f}" if pd.notnull(x) else "")
 filtered_df["Total Line Item Price"] = filtered_df["Total Line Item Price"].map(lambda x: f"{x:.2f}" if pd.notnull(x) else "")
+
+if short_text_filter:
+    search_terms = short_text_filter.lower().split()
+
+    js_highlight = """
+    function(params) {
+        if (!params.value) return '';
+        let value = params.value;
+        const keywords = [%s];
+        keywords.forEach(function(word) {
+            const re = new RegExp(word, 'gi');
+            value = value.replace(re, function(match) {
+                return '<span style="background-color: yellow; font-weight: bold;">' + match + '</span>';
+            });
+        });
+        return value;
+    }
+    """ % ",".join([f"'{k}'" for k in search_terms])
+
+    gb.configure_column(
+        "Short Text",
+        cellRenderer=js_highlight,
+        wrapText=True,
+        autoHeight=True
+    )
 
 # --- Build AgGrid table
 gb = GridOptionsBuilder.from_dataframe(filtered_df)

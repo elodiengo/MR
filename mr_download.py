@@ -4,7 +4,7 @@ import pandas as pd
 # --- Load Data ---
 @st.cache_data
 def load_data():
-    df = pd.read_excel("Formatted_PO_Data.xlsx", sheet_name="Sheet1", dtype=str)
+    df = pd.read_excel("Formatted_PO_Data OG.xlsx", sheet_name="MasterData", dtype=str)
     df["GR Qty"] = df["GR Qty"].astype(float)
     df["IR Qty"] = df["IR Qty"].astype(float)
     df["Payment Status"] = df.apply(

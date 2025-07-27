@@ -40,7 +40,7 @@ cols2 = st.columns(1)
 with cols2[0]: short_text_filter = st.text_input("Short Text (contains, multiple allowed)")
 
 # --- PO Released Date Filter ---
-st.markdown("### 📅 Filter by PO Released Date")
+st.markdown("### Filter by PO Released Date")
 min_date = df["PO Released Date"].min().date() if df["PO Released Date"].notnull().any() else date(2000, 1, 1)
 max_date = df["PO Released Date"].max().date() if df["PO Released Date"].notnull().any() else date.today()
 
@@ -148,7 +148,7 @@ pending_payment = (
     .sum()
 )
 
-st.markdown("### 💰 Summary Report (CAD)")
-st.metric("✅ Actual Payment (Paid)", f"${actual_payment:,.2f} CAD")
-st.metric("⏳ Pending Payment (Unpaid)", f"${pending_payment:,.2f} CAD")
+st.markdown("###  Summary Report (CAD)")
+st.metric(" Actual Payment (Paid)", f"${actual_payment:,.2f} CAD")
+st.metric(" Pending Payment (Unpaid)", f"${pending_payment:,.2f} CAD")
 

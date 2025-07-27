@@ -46,6 +46,10 @@ insert_pos = cols.index("Purchasing Document") + 1
 cols.insert(insert_pos, "Payment Status")
 filtered_df = filtered_df[cols]
 
+filtered_df["Net Price"] = pd.to_numeric(filtered_df["Net Price"], errors="coerce")
+filtered_df["Total Line Item Price"] = pd.to_numeric(filtered_df["Total Line Item Price"], errors="coerce")
+
+# Step 2: Format to strings with 2 decimal places (optional, if you want formatted display only)
 filtered_df["Net Price"] = filtered_df["Net Price"].map(lambda x: f"{x:.2f}" if pd.notnull(x) else "")
 filtered_df["Total Line Item Price"] = filtered_df["Total Line Item Price"].map(lambda x: f"{x:.2f}" if pd.notnull(x) else "")
 

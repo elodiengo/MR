@@ -107,7 +107,6 @@ if short_text_filter:
         wrapText=True,
         autoHeight=True
     )
-
 # --- Build AgGrid table
 gb = GridOptionsBuilder.from_dataframe(filtered_df)
 gb.configure_pagination()
